@@ -1,0 +1,32 @@
+version: "3.8"
+
+services:
+  main:
+    container_name: main
+    build:
+      context: ./main
+      dockerfile: Dockerfile
+    volumes:
+      - ./main:/app
+      - /app/node_modules
+    ports:
+      - "4000:4000"
+    environment:
+      - MONGO_URL=mongodb://userdb:27017/demo
+    depends_on:
+      - userdb
+
+  userdb:
+    container_name: userdb
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_DATABASE=demo
+    volumes:
+      - mongo-data:/data/db
+      - ./init-users.js:/docker-entrypoint-initdb.d/init-users.js:ro
+    restart: always
+
+volumes:
+  mongo-data:
